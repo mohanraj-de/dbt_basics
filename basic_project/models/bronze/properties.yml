@@ -1,0 +1,4 @@
+models:
+  - name: bronze_customer
+    config:
+      materialized: view
