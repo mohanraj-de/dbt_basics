@@ -86,7 +86,6 @@ models:
     # Config indicated by + and applies to all files under models/example/
     bronze:
       +materialized: table
-      schema: bronze
 
 properties.yml:
 
@@ -94,10 +93,119 @@ models:
   - name: bronze_customer
     config:
       materialized: view
-      schema: bronze
 
 blocks:
 {{config(materialized= 'view')}}
 select 
 * 
 from {{source('source','dim_date')}}
+
+
+**Custom Schema:**
+ the above examples creates only tables in default.
+
+ schema can be defined similar to materialized properties.
+
+dbt_project.yml:
+
+models:
+  basic_project:
+    # Config indicated by + and applies to all files under models/example/
+    bronze:
+      +materialized: table
+      schema: "bronze"
+
+But the dbt generates schema (macro) in backend by concat(default_schema,custom_schema) . here custom schema is the one in configs.
+
+Fix:
+overide macro by remove default:
+sample from : https://docs.getdbt.com/docs/build/custom-schemas?version=2.0
+
+Models now saved in bronze correctly.
+
+**feature branch**
+git switch -c feature_1 : creates new branch from main branch
+
+Git similar to CICD where we version our codes in dev and deploy to higher branch via merge
+
+**node selection : run specific models**
+dbt run --select "bronze_customer" -- runs only one model
+dbt run --select "bronze_customer bronze_date " -- runs only specific models
+dbt run --select "/models/bronze/" -- runs oall models in a layer
+
+## dbt tests
+
+data test are assertion like pydantic model to chekc for validating data against specific rules.
+
+**Generic Test (for data integrity)**
+
+add datatest on properties file in each layer
+
+  - name: bronze_store
+    columns:
+      - name: store_sk
+        data_tests:
+          - unique
+          - not_null
+
+      - name: store_name
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['MegaMart Manhattan','MegaMart Brooklyn','MegaMart Austin','MegaMart San Jose','MegaMart Toronto']
+              config:
+                severity: warn
+
+severity: warn -- throws warn instead of fail
+
+
+**Singular Test (for checing logs)**
+
+eg: age>=0,cibil bt 0-900
+
+select 
+* 
+from
+{{ ref("bronze_fact_sales") }} 
+where gross_amount < 0 
+and net_amount< 0
+
+we code this negation in tests folder . if any op in test then test failed.
+
+after creating this, code didnt run . since model is unable to resolve ref.
+
+dbt parse → Checks your dbt project files, YAML, Jinja, models, and dependencies to build the project graph; doesn't execute SQL.
+
+dbt compile → Resolves Jinja (ref(), source(), macros, configs) and generates the final SQL that dbt would execute; doesn't execute the SQL.
+dbt compile --select bronze_fact_sales
+
+Test ran successfully.
+
+singular test can be any nested sql queries join
+
+**Custom generic Test (for checing logs)**
+
+reusable generic tests that are not in build. like non negative.
+they are built as macros in .\tests\generic\{name}.sql
+
+macros are basically similar to functions in python
+
+.\tests\generic\generic_non_negative.sql
+{% test generic_non_negative(model,column_name) %}
+
+select 
+    *
+from 
+    model
+where 
+    column_name<0
+
+{% endtest %}
+
+Once done , add it in the generic test i.e bronze properties file
+
+run dbt_test and check
+
+ALL test passed. 
+
+Note : f"{i}" >> {{ model }} - dynamic jinga variable
