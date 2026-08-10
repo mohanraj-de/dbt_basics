@@ -209,3 +209,18 @@ run dbt_test and check
 ALL test passed. 
 
 Note : f"{i}" >> {{ model }} - dynamic jinga variable
+
+**git merge**
+
+commit changes >> checkout to tgt >> merge
+
+(dbt-basics) PS E:\AI\GIT\dbt_basics\basic_project> cd ..
+(dbt-basics) PS E:\AI\GIT\dbt_basics> git add .
+(dbt-basics) PS E:\AI\GIT\dbt_basics> git commit -m "dbt tests check in - generic, singular,custom generic"
+[feature_1 226f9c8] dbt tests check in - generic, singular,custom generic
+ 5 files changed, 150 insertions(+), 5 deletions(-)
+ create mode 100644 basic_project/tests/generic/generic_non_negative.sql
+ create mode 100644 basic_project/tests/non_negative_amt.sql
+(dbt-basics) PS E:\AI\GIT\dbt_basics> git checkout master                                                  
+Switched to branch 'master'
+(dbt-basics) PS E:\AI\GIT\dbt_basics> git merge feature_1
