@@ -35,3 +35,9 @@ models:
     bronze:
       +materialized: table
       +schema: bronze
+
+## dbt seeds → Version-controlled CSV files that dbt loads into the data warehouse as tables, typically for small, static reference/configuration datasets.
+
+seeds:
+  basic_project:
+    +schema: bronze
