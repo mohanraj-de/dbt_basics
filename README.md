@@ -255,4 +255,41 @@ programming template language. helps integrate sql with programming functionalit
     {{i}}
 {% endfor %}
 
+## Snapshots
 
+Snapshots are used for SCD features of data pipeline.
+
+created input fact table for scd in source schema and add it in source.yml
+```sql
+create table items (
+    id int,
+    name string,
+    category string,
+    updated_date timestamp
+);
+
+insert into items values 
+    (1, 'fridge', 'electronics', current_timestamp()),
+    (2, 'car', 'transport', current_timestamp()),
+    (3, 'chair', 'furniture', current_timestamp()),
+    (4, 'table', 'furniture', current_timestamp());
+```
+
+create a gold layer transformation for scd 2 which will be used as reference in snapshot job
+create snapshot .yml refering to gold scd model with relavant params
+
+run dbt snapshots after running gold model or just build everything using dbt build
+
+you will see the gold_source_items and gold_items in gold schema additionally.
+
+do insert for checking scd
+```sql
+insert into source.items values 
+(4, 'AC', 'electronics', current_timestamp())
+;
+```
+
+run dbt build and check again. you will see expired scd 2 row for item 4
+
+
+why a dedicated source layer needeed? for audit the input and use it as input for scd transformation
