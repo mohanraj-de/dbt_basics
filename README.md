@@ -224,3 +224,35 @@ commit changes >> checkout to tgt >> merge
 (dbt-basics) PS E:\AI\GIT\dbt_basics> git checkout master                                                  
 Switched to branch 'master'
 (dbt-basics) PS E:\AI\GIT\dbt_basics> git merge feature_1
+
+## dbt seeds
+
+repo for small lookup tables like company category, pincode maps. these doesnt have specific source. DE/BA provides tags.
+seeds are saved in databricks as table.
+define the properties in dbt_project.yml
+
+run seed (create seed table in table) by:  dbt seed 
+
+use dbt seed tables in models by using {{ ref('store_mapping') }}
+
+## analyses folder
+
+Rough space for exploration . it wont be referenced anywhere in dbt models. pure rough note just for analyses.
+
+**Note:** run and compiled folders in target shows the raw transformed query which will be actually executed in databricks. 
+
+## Jinjas
+
+programming template language. helps integrate sql with programming functionalities.
+
+{% set a=['RAM','ravan','lakshman']%}
+
+{%- for i in a -%}
+    {%- if i=="RAM" -%}
+        {% continue %}
+    {% endif %}
+
+    {{i}}
+{% endfor %}
+
+
