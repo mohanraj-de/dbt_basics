@@ -293,3 +293,32 @@ run dbt build and check again. you will see expired scd 2 row for item 4
 
 
 why a dedicated source layer needeed? for audit the input and use it as input for scd transformation
+
+
+## dbt continous deplyment
+
+deploy code from dev to prod by changing the following.
+
+1.env variables:
+setup prod connection in profiles.yml
+set target to prod
+check all instances of schema hard coding is made dynamic
+target variables in project and profile.yml
+
+2.dependencies:
+replicate source schema if needed in prod using create table ___ as select * __;
+
+3. build
+dbt build --target prod
+
+```python
+18:16:45  Finished running 1 seed, 1 snapshot, 5 table models, 7 data tests, 2 view models in 0 hours 1 minutes and 24.53 seconds (84.53s).
+18:16:45  
+18:16:45  Completed successfully
+18:16:45  
+18:16:45  Done. PASS=16 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=16
+```
+
+## DBT model is made dynamic as per environment >> env agnostic
+
+## push this code to git master post validation for version 1 release
